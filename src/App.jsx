@@ -11,6 +11,7 @@ import AdminLayOut from "./components/AdminLayOut.jsx";
 import AdministracionPage from "./pages/Administracion/AdministracionPage.jsx";
 import ClientsPage from "./pages/clients/ClientsPage.jsx";
 import StockPage from "./pages/DroneStock/StockPage.jsx";
+import OrderPage from "./pages/Orders/OrdersPage.jsx";
 function App() {
 
 
@@ -72,6 +73,13 @@ function App() {
                 element={
                     // eslint-disable-next-line react/no-children-prop
                     <AdminLayOut children={<StockPage />} />
+                }
+            />
+            <Route
+                path="/order"
+                element={
+                    // eslint-disable-next-line react/no-children-prop
+                    <AdminLayOut children={<OrderPage />} />
                 }
             />
         </Routes>

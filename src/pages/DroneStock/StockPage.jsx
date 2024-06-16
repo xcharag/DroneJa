@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { Container, Row, Col, Table, Button, Modal, Form } from 'react-bootstrap';
 import './StockPage.css'; // Custom CSS for styling
 
