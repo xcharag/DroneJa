@@ -7,6 +7,10 @@ import DefaultLayOut from "./components/DefaultLayOut.jsx";
 import CartPage from "./pages/cart/CartPage.jsx";
 import AccountPage from "./pages/Account/AccountPage.jsx";
 import SignUpPage from "./pages/signup/SignUpPage.jsx";
+import AdminLayOut from "./components/AdminLayOut.jsx";
+import AdministracionPage from "./pages/Administracion/AdministracionPage.jsx";
+import ClientsPage from "./pages/clients/ClientsPage.jsx";
+import StockPage from "./pages/DroneStock/StockPage.jsx";
 function App() {
 
 
@@ -22,7 +26,7 @@ function App() {
             />
 
             <Route
-                path="/shop"
+                path="/Productos"
                 element={
                     // eslint-disable-next-line react/no-children-prop
                     <DefaultLayOut children={<ShopPage />} />
@@ -47,6 +51,27 @@ function App() {
                 element={
                     // eslint-disable-next-line react/no-children-prop
                     <DefaultLayOut children={<SignUpPage />} />
+                }
+            />
+            <Route
+                path="/Administracion"
+                element={
+                    // eslint-disable-next-line react/no-children-prop
+                    <AdminLayOut children={<AdministracionPage />} />
+                }
+            />
+            <Route
+                path="/Clientes"
+                element={
+                    // eslint-disable-next-line react/no-children-prop
+                    <AdminLayOut children={<ClientsPage />} />
+                }
+            />
+            <Route
+                path="/Stock"
+                element={
+                    // eslint-disable-next-line react/no-children-prop
+                    <AdminLayOut children={<StockPage />} />
                 }
             />
         </Routes>

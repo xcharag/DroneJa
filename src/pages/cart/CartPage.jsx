@@ -48,7 +48,7 @@ const CartPage = () => {
                                 </Col>
                                 <Col md={2}>
                                     <Button variant="danger" onClick={() => handleRemoveItem(item.id)}>
-                                        Remove
+                                        Borrar
                                     </Button>
                                 </Col>
                             </Row>
@@ -60,7 +60,7 @@ const CartPage = () => {
                 <Col className="text-right">
                     <h3>Total: ${totalPrice.toFixed(2)}</h3>
                     <Button variant="success" className="mt-3">
-                        Proceed to Checkout
+                        Proceder al Pago
                     </Button>
                 </Col>
             </Row>

@@ -49,7 +49,7 @@ const HomePage = () => {
 
             <Row className="my-4">
                 <Col>
-                    <h2><PiDroneDuotone /> Featured Products</h2>
+                    <h2><PiDroneDuotone /> Productos Destacados</h2>
                 </Col>
             </Row>
             <Row>
@@ -69,7 +69,7 @@ const HomePage = () => {
 
             <Row className="my-4">
                 <Col>
-                    <h2><FaStar /> Best Sellers</h2>
+                    <h2><FaStar /> Drones mas vendidos</h2>
                 </Col>
             </Row>
             <Row>

@@ -6,6 +6,7 @@ const SignUpPage = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [Nombre, setNombre] = useState('');
+    const [NombreEmpresa , setNombreEmpresa] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
@@ -67,6 +68,16 @@ const SignUpPage = () => {
                                 placeholder="Nombre"
                                 value={Nombre}
                                 onChange={(e) => setNombre(e.target.value)}
+                                required
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formConfirmPassword" className="mb-3">
+                            <Form.Label>Nombre de la Empresa</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Nombre de la Empresa"
+                                value={NombreEmpresa}
+                                onChange={(e) => setNombreEmpresa(e.target.value)}
                                 required
                             />
                         </Form.Group>

@@ -2,7 +2,7 @@ import { Navbar, Nav, Container } from 'react-bootstrap';
 import { FaShoppingCart, FaUser } from 'react-icons/fa';
 import { PiDroneDuotone } from "react-icons/pi";
 
-const AppBar = () => {
+const AdminAppBar = () => {
     return (
         <Navbar bg="dark" variant="dark" expand="lg">
             <Container>
@@ -12,14 +12,14 @@ const AppBar = () => {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
-                        <Nav.Link href="/">Inicio</Nav.Link>
-                        <Nav.Link href="/Productos">Productos</Nav.Link>
-                        <Nav.Link href="/Administracion">Administracion</Nav.Link>
-                        <Nav.Link href="/contact">Contact</Nav.Link>
+                        <Nav.Link href="/Administracion">Panel de Control</Nav.Link>
+                        <Nav.Link href="/Clientes">Clientes</Nav.Link>
+                        <Nav.Link href="/about">Ordenes</Nav.Link>
+                        <Nav.Link href="/Stock">Stock</Nav.Link>
                     </Nav>
                     <Nav>
-                        <Nav.Link href="/cart">
-                            <FaShoppingCart /> Carrito
+                        <Nav.Link href="/">
+                            <FaShoppingCart /> Volver
                         </Nav.Link>
                         <Nav.Link href="/account">
                             <FaUser /> Cuenta
@@ -31,4 +31,4 @@ const AppBar = () => {
     );
 };
 
-export default AppBar;
+export default AdminAppBar;
