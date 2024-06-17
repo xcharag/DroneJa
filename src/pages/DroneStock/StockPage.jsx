@@ -1,39 +1,134 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Table, Button, Modal, Form } from 'react-bootstrap';
 import './StockPage.css'; // Custom CSS for styling
+import { useMutation, useQuery } from "@apollo/client";
+import { GETPRODUCTS } from "../../utility/query.js"; // Import the query
+import { NEWPRODUCT, UPDATEPRODUCT, DELETEPRODUCT } from "../../utility/mutation.js";
 
 const StockPage = () => {
-    const [drones, setDrones] = useState([
-        { id: 1, name: 'Drone A', description: 'This is Drone A', stock: 10, sold: 5, price: 599, imageUrl: 'https://via.placeholder.com/150' },
-        { id: 2, name: 'Drone B', description: 'This is Drone B', stock: 5, sold: 15, price: 399, imageUrl: 'https://via.placeholder.com/150' },
-        { id: 3, name: 'Drone C', description: 'This is Drone C', stock: 8, sold: 8, price: 799, imageUrl: 'https://via.placeholder.com/150' }
-    ]);
+    const { data, loading, error } = useQuery(GETPRODUCTS, {
+        context: {
+            headers: {
+                authorization: localStorage.getItem('token')
+            }
+        }
+    });
 
-    const [showBestSellingModal, setShowBestSellingModal] = useState(false);
-    const [showLeastSoldModal, setShowLeastSoldModal] = useState(false);
+    const [drones, setDrones] = useState([]);
+    const [selectedDrone, setSelectedDrone] = useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
 
-    const handleCloseBestSelling = () => setShowBestSellingModal(false);
-    const handleCloseLeastSold = () => setShowLeastSoldModal(false);
-    const handleCloseAdd = () => setShowAddModal(false);
+    const [addDrone, { loading: mutationLoading, error: mutationError }] = useMutation(NEWPRODUCT, {
+        context: {
+            headers: {
+                authorization: localStorage.getItem('token')
+            }
+        },
+        onCompleted: (data) => {
+            // Update the state with the new product after mutation completion
+            setDrones((prevDrones) => [
+                ...prevDrones,
+                data.newProduct
+            ]);
+            setShowAddModal(false);
+        },
+        onError: (error) => {
+            console.error("Error adding drone:", error);
+        }
+    });
 
-    const handleShowBestSelling = () => setShowBestSellingModal(true);
-    const handleShowLeastSold = () => setShowLeastSoldModal(true);
-    const handleShowAdd = () => setShowAddModal(true);
+    const [updateProduct] = useMutation(UPDATEPRODUCT);
+    const [deleteProduct] = useMutation(DELETEPRODUCT);
 
-    const getTop10BestSelling = () => {
-        return [...drones].sort((a, b) => b.sold - a.sold).slice(0, 10);
+    useEffect(() => {
+        if (data && data.getProducts) {
+            setDrones(data.getProducts);
+        }
+    }, [data]);
+
+    const handleShowEditModal = (drone) => {
+        setSelectedDrone(drone);
+        setShowEditModal(true);
     };
 
-    const getTop10LeastSold = () => {
-        return [...drones].sort((a, b) => a.sold - b.sold).slice(0, 10);
+    const handleCloseEditModal = () => {
+        setShowEditModal(false);
     };
 
-    const handleAdd = (newDrone) => {
-        const updatedDrones = [...drones, { id: drones.length + 1, ...newDrone }];
-        setDrones(updatedDrones);
+    const handleShowAddModal = () => {
+        setShowAddModal(true);
+    };
+
+    const handleCloseAddModal = () => {
         setShowAddModal(false);
     };
+
+    const handleEdit = async (event) => {
+        event.preventDefault();
+        console.log(selectedDrone);
+        try {
+            const updated = await updateProduct({
+                variables: {
+                    updateProductId: selectedDrone.id,
+                    input: {
+                        name: selectedDrone.name,
+                        description: selectedDrone.description,
+                        stock: parseInt(selectedDrone.stock),
+                        price: selectedDrone.price
+                    }
+                }
+            });
+            console.log(updated);
+            console.log(selectedDrone);
+            setShowEditModal(false);
+        } catch (error) {
+            console.error("Error updating drone:", error);
+        }
+    };
+
+    const handleAdd = async (event) => {
+        event.preventDefault();
+
+        const { name, description, stock, price } = event.target;
+
+        const droneInput = {
+            name: name.value.trim(),
+            description: description.value.trim(),
+            stock: parseInt(stock.value, 10),
+            price: parseFloat(price.value)
+        };
+
+        try {
+            const { data } = await addDrone({
+                variables: {
+                    input: droneInput
+                }
+            });
+
+            console.log(data);
+
+            // Close the modal after adding the drone
+            setShowAddModal(false);
+        } catch (error) {
+            console.error("Error adding drone:", error);
+        }
+    };
+
+    const handleDelete = async (droneId) => {
+        try {
+            // Call the delete mutation
+            const resp = await deleteProduct({
+                variables: {
+                    deleteProductId: droneId
+                }
+            });
+            console.log(resp);
+            window.location.reload();
+        } catch (error) {
+            console.error("Error deleting drone:", error);
+        }
+    }
 
     return (
         <Container>
@@ -48,25 +143,23 @@ const StockPage = () => {
                                 <th>Nombre</th>
                                 <th>Descripción</th>
                                 <th>Stock</th>
-                                <th>Vendidos</th>
                                 <th>Precio</th>
                                 <th>Acciones</th>
                             </tr>
                             </thead>
                             <tbody>
-                            {drones.map(drone => (
+                            {drones.map((drone) => (
                                 <tr key={drone.id}>
                                     <td>{drone.id}</td>
                                     <td>{drone.name}</td>
                                     <td>{drone.description}</td>
                                     <td>{drone.stock}</td>
-                                    <td>{drone.sold}</td>
                                     <td>${drone.price}</td>
                                     <td className="table-actions">
-                                        <Button variant="warning" size="sm">
+                                        <Button variant="warning" size="sm" onClick={() => handleShowEditModal(drone)}>
                                             Editar
                                         </Button>
-                                        <Button variant="danger" size="sm">
+                                        <Button variant="danger" size="sm" onClick={()=> handleDelete(drone.id)}>
                                             Eliminar
                                         </Button>
                                     </td>
@@ -77,82 +170,73 @@ const StockPage = () => {
                     </div>
 
                     <div className="buttons-container">
-                        <Button variant="success" className="my-2" onClick={handleShowBestSelling}>
+                        <Button variant="success" className="my-2">
                             Mejor Vendido
                         </Button>
-                        <Button variant="secondary" className="my-2" onClick={handleShowLeastSold}>
+                        <Button variant="secondary" className="my-2">
                             Menos Vendido
                         </Button>
-                        <Button variant="primary" className="my-2" onClick={handleShowAdd}>
+                        <Button variant="primary" className="my-2" onClick={handleShowAddModal}>
                             Agregar Drone
                         </Button>
                     </div>
 
-                    <Modal show={showBestSellingModal} onHide={handleCloseBestSelling}>
+                    {/* Edit Modal */}
+                    <Modal show={showEditModal} onHide={handleCloseEditModal}>
                         <Modal.Header closeButton>
-                            <Modal.Title>Top 10 Mejor Vendidos</Modal.Title>
+                            <Modal.Title>Editar Drone</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
-                            <Table striped bordered hover responsive className="table">
-                                <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nombre</th>
-                                    <th>Descripción</th>
-                                    <th>Stock</th>
-                                    <th>Vendidos</th>
-                                    <th>Precio</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {getTop10BestSelling().map(drone => (
-                                    <tr key={drone.id}>
-                                        <td>{drone.id}</td>
-                                        <td>{drone.name}</td>
-                                        <td>{drone.description}</td>
-                                        <td>{drone.stock}</td>
-                                        <td>{drone.sold}</td>
-                                        <td>${drone.price}</td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </Table>
+                            <Form onSubmit={handleEdit}>
+                                <Form.Group controlId="formName" className="mb-3">
+                                    <Form.Label>Nombre</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        defaultValue={selectedDrone?.name}
+                                        onChange={(e) => setSelectedDrone({ ...selectedDrone, name: e.target.value })}
+                                        name="name"
+                                        required
+                                    />
+                                </Form.Group>
+                                <Form.Group controlId="formDescription" className="mb-3">
+                                    <Form.Label>Descripción</Form.Label>
+                                    <Form.Control
+                                        as="textarea"
+                                        rows={3}
+                                        defaultValue={selectedDrone?.description}
+                                        onChange={(e) => setSelectedDrone({ ...selectedDrone, description: e.target.value })}
+                                        name="description"
+                                        required
+                                    />
+                                </Form.Group>
+                                <Form.Group controlId="formStock" className="mb-3">
+                                    <Form.Label>Stock</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        defaultValue={selectedDrone?.stock}
+                                        onChange={(e) => setSelectedDrone({ ...selectedDrone, stock: e.target.value })}
+                                        name="stock"
+                                        required
+                                    />
+                                </Form.Group>
+                                <Form.Group controlId="formPrice" className="mb-3">
+                                    <Form.Label>Precio</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        defaultValue={selectedDrone?.price}
+                                        onChange={(e) => setSelectedDrone({ ...selectedDrone, price: e.target.value })}
+                                        name="price"
+                                        required
+                                    />
+                                </Form.Group>
+                                <Button variant="primary" type="submit">
+                                    Guardar cambios
+                                </Button>
+                            </Form>
                         </Modal.Body>
                     </Modal>
 
-                    <Modal show={showLeastSoldModal} onHide={handleCloseLeastSold}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>Top 10 Menos Vendidos</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            <Table striped bordered hover responsive className="table">
-                                <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nombre</th>
-                                    <th>Descripción</th>
-                                    <th>Stock</th>
-                                    <th>Vendidos</th>
-                                    <th>Precio</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {getTop10LeastSold().map(drone => (
-                                    <tr key={drone.id}>
-                                        <td>{drone.id}</td>
-                                        <td>{drone.name}</td>
-                                        <td>{drone.description}</td>
-                                        <td>{drone.stock}</td>
-                                        <td>{drone.sold}</td>
-                                        <td>${drone.price}</td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </Table>
-                        </Modal.Body>
-                    </Modal>
-
-                    <Modal show={showAddModal} onHide={handleCloseAdd}>
+                    <Modal show={showAddModal} onHide={handleCloseAddModal}>
                         <Modal.Header closeButton>
                             <Modal.Title>Agregar Drone</Modal.Title>
                         </Modal.Header>
@@ -192,15 +276,6 @@ const StockPage = () => {
                                         type="number"
                                         placeholder="Ingrese precio"
                                         name="price"
-                                        required
-                                    />
-                                </Form.Group>
-                                <Form.Group controlId="formImageUrl" className="mb-3">
-                                    <Form.Label>URL de la Imagen</Form.Label>
-                                    <Form.Control
-                                        type="url"
-                                        placeholder="Ingrese URL de la imagen"
-                                        name="imageUrl"
                                         required
                                     />
                                 </Form.Group>

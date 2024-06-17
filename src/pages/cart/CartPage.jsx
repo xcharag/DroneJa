@@ -1,23 +1,35 @@
 import { Container, Row, Col, ListGroup, Button, Form } from 'react-bootstrap';
-import {useState} from "react";
-
-const initialCartItems = [
-    { id: 1, name: 'Drone A', price: 200, quantity: 1 },
-    { id: 2, name: 'Drone B', price: 350, quantity: 1 },
-    { id: 3, name: 'Drone C', price: 500, quantity: 1 },
-];
+import { useState, useEffect } from "react";
 
 const CartPage = () => {
-    const [cartItems, setCartItems] = useState(initialCartItems);
+    const [cartItems, setCartItems] = useState([]);
+
+    useEffect(() => {
+        const cart = JSON.parse(sessionStorage.getItem('cart')) || {};
+        const items = Object.values(cart);
+        setCartItems(items);
+    }, []);
 
     const handleQuantityChange = (id, quantity) => {
-        setCartItems(cartItems.map(item =>
+        const updatedItems = cartItems.map(item =>
             item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
-        ));
+        );
+        setCartItems(updatedItems);
+        updateSessionStorage(updatedItems);
     };
 
     const handleRemoveItem = (id) => {
-        setCartItems(cartItems.filter(item => item.id !== id));
+        const updatedItems = cartItems.filter(item => item.id !== id);
+        setCartItems(updatedItems);
+        updateSessionStorage(updatedItems);
+    };
+
+    const updateSessionStorage = (items) => {
+        const cart = items.reduce((acc, item) => {
+            acc[item.id] = item;
+            return acc;
+        }, {});
+        sessionStorage.setItem('cart', JSON.stringify(cart));
     };
 
     const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);

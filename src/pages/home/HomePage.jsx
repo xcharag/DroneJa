@@ -1,20 +1,25 @@
 import { Container, Row, Col, Card, Button, Carousel } from 'react-bootstrap';
 import { FaStar, FaTags } from 'react-icons/fa';
 import { PiDroneDuotone } from "react-icons/pi";
+import { GETLASTADDEDPRODUCTS } from "../../utility/query.js";
+import { useLazyQuery } from "@apollo/client";
 import './HomePage.css';
+import {useEffect, useState} from "react";
 
 const HomePage = () => {
-    const featuredProducts = [
-        { id: 1, name: 'Drone A', price: '$499', image: 'https://placehold.co/300x300' },
-        { id: 2, name: 'Drone B', price: '$799', image: 'https://placehold.co/300x300' },
-        { id: 3, name: 'Drone C', price: '$999', image: 'https://placehold.co/300x300' },
-    ];
+    const [featuredProducts, setFeaturedProducts] = useState([]);
+    const [bestSellers, setBestSellers] = useState([]);
 
-    const bestSellers = [
-        { id: 1, name: 'Drone X', price: '$699', image: 'https://placehold.co/300x300' },
-        { id: 2, name: 'Drone Y', price: '$599', image: 'https://placehold.co/300x300' },
-        { id: 3, name: 'Drone Z', price: '$899', image: 'https://placehold.co/300x300' },
-    ];
+    // Fetch the last added products
+    const [getLastAddedProducts, { data: lastAddedProducts }] = useLazyQuery(GETLASTADDEDPRODUCTS);
+
+    useEffect(() => {
+        if (!lastAddedProducts) {
+            getLastAddedProducts().then(r => r);
+        } else {
+            setFeaturedProducts(lastAddedProducts.getLastAddedProducts);
+        }
+    }, [lastAddedProducts, getLastAddedProducts]);
 
     return (
         <Container fluid>
@@ -49,7 +54,7 @@ const HomePage = () => {
 
             <Row className="my-4">
                 <Col>
-                    <h2><PiDroneDuotone /> Productos Destacados</h2>
+                    <h2><PiDroneDuotone /> Ultimos Lanzamientos</h2>
                 </Col>
             </Row>
             <Row>
@@ -59,7 +64,8 @@ const HomePage = () => {
                             <Card.Img variant="top" src={product.image} />
                             <Card.Body>
                                 <Card.Title>{product.name}</Card.Title>
-                                <Card.Text>{product.price}</Card.Text>
+                                <Card.Text>{product.description}</Card.Text>
+                                <Card.Text>{product.price} $</Card.Text>
                                 <Button variant="primary">Buy Now</Button>
                             </Card.Body>
                         </Card>
@@ -79,7 +85,7 @@ const HomePage = () => {
                             <Card.Img variant="top" src={product.image} />
                             <Card.Body>
                                 <Card.Title>{product.name}</Card.Title>
-                                <Card.Text>{product.price}</Card.Text>
+                                <Card.Text>{product.price} $</Card.Text>
                                 <Button variant="primary">Buy Now</Button>
                             </Card.Body>
                         </Card>
