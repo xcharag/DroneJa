@@ -1,46 +1,122 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Table, Button, Modal, Form } from 'react-bootstrap';
-import './ClientsPage.css'; // Make sure to import your custom CSS
+import './ClientsPage.css';
+import { GETUSERSBYSELLER } from "../../utility/query.js";
+import { NEWUSER, UPDATEUSER } from "../../utility/mutation.js"; // Import the mutation
+import { useLazyQuery, useMutation } from "@apollo/client";
 
 const ClientsPage = () => {
-    const [clients, setClients] = useState([
-        { id: 1, name: 'John', lastname: 'Doe', email: 'john.doe@example.com' },
-        { id: 2, name: 'Jane', lastname: 'Smith', email: 'jane.smith@example.com' },
-        { id: 3, name: 'Michael', lastname: 'Johnson', email: 'michael.johnson@example.com' }
-    ]);
+    const [clients, setClients] = useState([]);
+    const [getAllClients] = useLazyQuery(GETUSERSBYSELLER);
+    const [addUser] = useMutation(NEWUSER); // Use the mutation
+    const [updateUser] = useMutation(UPDATEUSER); // Use the update mutation
 
     const [showEditModal, setShowEditModal] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
-    const [editClient, setEditClient] = useState(null);
+    const [selectedClient, setSelectedClient] = useState(null);
     const [newClient, setNewClient] = useState({ name: '', lastname: '', email: '', password: '' });
+
+    useEffect(() => {
+        getClients();
+    }, []);
+
+    const getClients = async () => {
+        try {
+            const { data } = await getAllClients({
+                context: {
+                    headers: {
+                        authorization: localStorage.getItem('token')
+                    }
+                }
+            });
+            if (data) {
+                setClients(data.getUsersBySeller);
+            } else {
+                console.error('No clients found');
+            }
+        } catch (e) {
+            throw new Error(e.message);
+        }
+    }
 
     const handleCloseEdit = () => setShowEditModal(false);
     const handleCloseAdd = () => setShowAddModal(false);
     const handleShowEdit = (client) => {
-        setEditClient(client);
+        setSelectedClient(client);
         setShowEditModal(true);
     };
     const handleShowAdd = () => setShowAddModal(true);
 
-    const handleEdit = (e) => {
+    const handleEdit = async (e) => {
         e.preventDefault();
-        const updatedClients = clients.map(client =>
-            client.id === editClient.id ? editClient : client
-        );
-        setClients(updatedClients);
-        handleCloseEdit();
+
+        try {
+            console.log(selectedClient);
+            const { data } = await updateUser({
+                variables: {
+                    updateUserId: selectedClient.id,
+                    input: {
+                        name: selectedClient.name,
+                        lastName: selectedClient.lastName,
+                        email: selectedClient.email,
+                    }
+                },
+                context: {
+                    headers: {
+                        authorization: localStorage.getItem('token')
+                    }
+                }
+            });
+            console.log(data);
+
+            handleCloseEdit();
+        } catch (error) {
+            console.error("Error updating client:", error);
+        }
     };
 
-    const handleAdd = (e) => {
+    const handleAdd = async (e) => {
         e.preventDefault();
-        const newClientWithId = { ...newClient, id: clients.length + 1 };
-        setClients([...clients, newClientWithId]);
-        setNewClient({ name: '', lastname: '', email: '', password: '' });
-        handleCloseAdd();
+
+        try {
+            const sellerid = JSON.parse(localStorage.getItem('user')).id;
+            const { data } = await addUser({
+                variables: {
+                    input: {
+                        email: newClient.email,
+                        lastName: newClient.lastname,
+                        name: newClient.name,
+                        password: newClient.password,
+                        associatedSeller: sellerid,
+                        role: 'CLIENT'
+                    }
+                },
+                context: {
+                    headers: {
+                        authorization: localStorage.getItem('token')
+                    }
+                }
+            });
+
+            console.log(data);
+            // Fetch updated list of clients after the add submission
+            getClients();
+            handleCloseAdd();
+        } catch (error) {
+            console.error("Error adding client:", error);
+        }
     };
 
-    const handleRemove = (id) => {
-        setClients(clients.filter(client => client.id !== id));
+    const handleRemove = async (id) => {
+        try {
+            // Assuming a mutation for deleting user is defined
+            // await deleteUser({ variables: { id }, context: { headers: { authorization: localStorage.getItem('token') } } });
+
+            // Fetch updated list of clients after the delete submission
+            getClients();
+        } catch (error) {
+            console.error("Error deleting client:", error);
+        }
     };
 
     return (
@@ -64,7 +140,7 @@ const ClientsPage = () => {
                                 <tr key={client.id}>
                                     <td>{client.id}</td>
                                     <td>{client.name}</td>
-                                    <td>{client.lastname}</td>
+                                    <td>{client.lastName}</td>
                                     <td>{client.email}</td>
                                     <td className="table-actions">
                                         <Button
@@ -103,8 +179,8 @@ const ClientsPage = () => {
                                     <Form.Control
                                         type="text"
                                         placeholder="Ingrese nombre"
-                                        value={editClient?.name || ''}
-                                        onChange={(e) => setEditClient({ ...editClient, name: e.target.value })}
+                                        value={selectedClient?.name || ''}
+                                        onChange={(e) => setSelectedClient({ ...selectedClient, name: e.target.value })}
                                         required
                                     />
                                 </Form.Group>
@@ -113,8 +189,8 @@ const ClientsPage = () => {
                                     <Form.Control
                                         type="text"
                                         placeholder="Ingrese apellido"
-                                        value={editClient?.lastname || ''}
-                                        onChange={(e) => setEditClient({ ...editClient, lastname: e.target.value })}
+                                        value={selectedClient?.lastName || ''}
+                                        onChange={(e) => setSelectedClient({ ...selectedClient, lastName: e.target.value })}
                                         required
                                     />
                                 </Form.Group>
@@ -123,8 +199,8 @@ const ClientsPage = () => {
                                     <Form.Control
                                         type="email"
                                         placeholder="Ingrese email"
-                                        value={editClient?.email || ''}
-                                        onChange={(e) => setEditClient({ ...editClient, email: e.target.value })}
+                                        value={selectedClient?.email || ''}
+                                        onChange={(e) => setSelectedClient({ ...selectedClient, email: e.target.value })}
                                         required
                                     />
                                 </Form.Group>

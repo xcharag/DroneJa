@@ -12,78 +12,75 @@ import AdministracionPage from "./pages/Administracion/AdministracionPage.jsx";
 import ClientsPage from "./pages/clients/ClientsPage.jsx";
 import StockPage from "./pages/DroneStock/StockPage.jsx";
 import OrderPage from "./pages/Orders/OrdersPage.jsx";
-function App() {
+import { ApolloProvider } from "@apollo/client";
+import { createApolloContext } from "./utility/ApolloClient.js";
 
+function App() {
+    const apolloClient = createApolloContext();
 
   return (
-    <Router>
-        <Routes>
-            <Route
-                path="/"
-                element={
-                    // eslint-disable-next-line react/no-children-prop
-                    <DefaultLayOut children={<HomePage />} />
-                }
-            />
-
-            <Route
-                path="/Productos"
-                element={
-                    // eslint-disable-next-line react/no-children-prop
-                    <DefaultLayOut children={<ShopPage />} />
-                }
-            />
-            <Route
-                path="/cart"
-                element={
-                    // eslint-disable-next-line react/no-children-prop
-                    <DefaultLayOut children={<CartPage />} />
-                }
-            />
-            <Route
-                path="/account"
-                element={
-                    // eslint-disable-next-line react/no-children-prop
-                    <DefaultLayOut children={<AccountPage />} />
-                }
-            />
-            <Route
-                path="/signup"
-                element={
-                    // eslint-disable-next-line react/no-children-prop
-                    <DefaultLayOut children={<SignUpPage />} />
-                }
-            />
-            <Route
-                path="/Administracion"
-                element={
-                    // eslint-disable-next-line react/no-children-prop
-                    <AdminLayOut children={<AdministracionPage />} />
-                }
-            />
-            <Route
-                path="/Clientes"
-                element={
-                    // eslint-disable-next-line react/no-children-prop
-                    <AdminLayOut children={<ClientsPage />} />
-                }
-            />
-            <Route
-                path="/Stock"
-                element={
-                    // eslint-disable-next-line react/no-children-prop
-                    <AdminLayOut children={<StockPage />} />
-                }
-            />
-            <Route
-                path="/order"
-                element={
-                    // eslint-disable-next-line react/no-children-prop
-                    <AdminLayOut children={<OrderPage />} />
-                }
-            />
-        </Routes>
-    </Router>
+      <ApolloProvider client={apolloClient}>
+        <Router>
+            <Routes>
+                <Route
+                    path="/"
+                    element={
+                        // eslint-disable-next-line react/no-children-prop
+                        <DefaultLayOut children={<HomePage />} />
+                    }
+                />
+                <Route
+                    path="/Productos"
+                    element={
+                        // eslint-disable-next-line react/no-children-prop
+                        <DefaultLayOut children={<ShopPage />} />
+                    }
+                />
+                <Route
+                    path="/cart"
+                    element={
+                        // eslint-disable-next-line react/no-children-prop
+                        <DefaultLayOut children={<CartPage />} />
+                    }
+                />
+                <Route
+                    path="/account"
+                    element={
+                        // eslint-disable-next-line react/no-children-prop
+                        <DefaultLayOut children={<AccountPage />} />
+                    }
+                />
+                <Route
+                    path="/signup"
+                    element={
+                        // eslint-disable-next-line react/no-children-prop
+                        <DefaultLayOut children={<SignUpPage />} />
+                    }
+                />
+                <Route
+                    path="/Administracion"
+                    element={
+                        // eslint-disable-next-line react/no-children-prop
+                        <AdminLayOut children={<AdministracionPage />} />
+                    }
+                />
+                <Route
+                    path="/Clientes"
+                    element={
+                        // eslint-disable-next-line react/no-children-prop
+                        <AdminLayOut children={<ClientsPage />} />
+                    }
+                />
+                <Route
+                    path="/Stock"
+                    element={
+                        // eslint-disable-next-line react/no-children-prop
+                        <AdminLayOut children={<StockPage />} />
+                    }
+                />
+            </Routes>
+        </Router>
+      </ApolloProvider>
   )
 }
 

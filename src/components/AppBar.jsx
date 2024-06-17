@@ -1,8 +1,28 @@
-import { Navbar, Nav, Container } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
+import { Navbar, Nav, Container, Dropdown } from 'react-bootstrap';
 import { FaShoppingCart, FaUser } from 'react-icons/fa';
-import { PiDroneDuotone } from "react-icons/pi";
+import { PiDroneDuotone } from 'react-icons/pi';
 
 const AppBar = () => {
+    const [role, setRole] = useState('');
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const userData = localStorage.getItem('user');
+        if (userData) {
+            const parsedUser = JSON.parse(userData);
+            setUser(parsedUser);
+            setRole(parsedUser.role);
+        }
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        setUser(null);
+        setRole('');
+    };
+
     return (
         <Navbar bg="dark" variant="dark" expand="lg">
             <Container>
@@ -14,16 +34,24 @@ const AppBar = () => {
                     <Nav className="me-auto">
                         <Nav.Link href="/">Inicio</Nav.Link>
                         <Nav.Link href="/Productos">Productos</Nav.Link>
-                        <Nav.Link href="/Administracion">Administracion</Nav.Link>
-                        <Nav.Link href="/contact">Contact</Nav.Link>
+                        {role === 'SELLER' && <Nav.Link href="/Administracion">Administracion</Nav.Link>}
                     </Nav>
                     <Nav>
                         <Nav.Link href="/cart">
                             <FaShoppingCart /> Carrito
                         </Nav.Link>
-                        <Nav.Link href="/account">
-                            <FaUser /> Cuenta
-                        </Nav.Link>
+                        <Dropdown alignRight>
+                            <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+                                <FaUser /> Cuenta
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                                {user ? (
+                                    <Dropdown.Item onClick={handleLogout}>Cerrar Sesión</Dropdown.Item>
+                                ) : (
+                                    <Dropdown.Item href="/account">Iniciar Sesión</Dropdown.Item>
+                                )}
+                            </Dropdown.Menu>
+                        </Dropdown>
                     </Nav>
                 </Navbar.Collapse>
             </Container>
