@@ -1,17 +1,20 @@
 import { Container, Row, Col, Card, Button, Carousel } from 'react-bootstrap';
 import { FaStar, FaTags } from 'react-icons/fa';
 import { PiDroneDuotone } from "react-icons/pi";
-import { GETLASTADDEDPRODUCTS } from "../../utility/query.js";
+import { GETLASTADDEDPRODUCTS, GETMOSTSOLDPRODUCTS } from "../../utility/query.js";
 import { useLazyQuery } from "@apollo/client";
 import './HomePage.css';
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 const HomePage = () => {
     const [featuredProducts, setFeaturedProducts] = useState([]);
-    const [bestSellers, setBestSellers] = useState([]);
+    const [bestProducts, setBestProducts] = useState([]);
 
     // Fetch the last added products
     const [getLastAddedProducts, { data: lastAddedProducts }] = useLazyQuery(GETLASTADDEDPRODUCTS);
+
+    // Fetch the most sold products
+    const [getMostSoldProducts, { data: mostSoldProducts }] = useLazyQuery(GETMOSTSOLDPRODUCTS);
 
     useEffect(() => {
         if (!lastAddedProducts) {
@@ -21,6 +24,14 @@ const HomePage = () => {
         }
     }, [lastAddedProducts, getLastAddedProducts]);
 
+    useEffect(() => {
+        if (!mostSoldProducts) {
+            getMostSoldProducts().then(r => r);
+        } else {
+            setBestProducts(mostSoldProducts.getMostSoldProducts);
+        }
+    }, [mostSoldProducts, getMostSoldProducts]);
+
     return (
         <Container fluid>
             <Row className="my-4">
@@ -29,7 +40,7 @@ const HomePage = () => {
                         <Carousel.Item>
                             <img
                                 className="d-block w-100"
-                                src="https://placehold.co/600x400"
+                                src="https://res.cloudinary.com/dkr7q42ww/image/upload/s0whi9fxttnvbtkuhp29.jpg"
                                 alt="First slide"
                             />
                             <Carousel.Caption>
@@ -40,7 +51,7 @@ const HomePage = () => {
                         <Carousel.Item>
                             <img
                                 className="d-block w-100"
-                                src="https://placehold.co/600x400"
+                                src="https://images.unsplash.com/photo-1525066087596-5249b898143c?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MTl8fHxlbnwwfHx8fHw%3D"
                                 alt="Second slide"
                             />
                             <Carousel.Caption>
@@ -79,13 +90,13 @@ const HomePage = () => {
                 </Col>
             </Row>
             <Row>
-                {bestSellers.map(product => (
+                {bestProducts.map(product => (
                     <Col md={4} key={product.id} className="mb-4">
                         <Card>
                             <Card.Img variant="top" src={product.image} />
                             <Card.Body>
                                 <Card.Title>{product.name}</Card.Title>
-                                <Card.Text>{product.price} $</Card.Text>
+                                <Card.Text>{product.totalQuantity} Drones Vendidos</Card.Text>
                                 <Button variant="primary">Buy Now</Button>
                             </Card.Body>
                         </Card>

@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import { Bar, Line, Pie } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement, ArcElement } from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { GETBESTSELLERS, GETBESTCLIENTS } from "../../utility/query.js";
+import { useQuery } from '@apollo/client';
 
 ChartJS.register(
     CategoryScale,
@@ -9,51 +11,79 @@ ChartJS.register(
     BarElement,
     Title,
     Tooltip,
-    Legend,
-    PointElement,
-    LineElement,
-    ArcElement
+    Legend
 );
 
 const AdministracionPage = () => {
-    const barData = {
-        labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+    const { data: sellerData, loading: sellerLoading, error: sellerError } = useQuery(GETBESTSELLERS);
+    const { data: clientData, loading: clientLoading, error: clientError } = useQuery(GETBESTCLIENTS);
+    const [sellerChartData, setSellerChartData] = useState({
+        labels: [],
         datasets: [
             {
-                label: 'Sales',
-                data: [30, 20, 40, 50, 60, 70],
+                label: 'Total Spent by Sellers',
+                data: [],
                 backgroundColor: 'rgba(75, 192, 192, 0.6)',
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1,
             },
         ],
-    };
+    });
 
-    const lineData = {
-        labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+    const [clientChartData, setClientChartData] = useState({
+        labels: [],
         datasets: [
             {
-                label: 'Revenue',
-                data: [100, 200, 300, 400, 500, 600],
-                fill: false,
-                backgroundColor: 'rgba(153, 102, 255, 0.6)',
-                borderColor: 'rgba(153, 102, 255, 1)',
-            },
-        ],
-    };
-
-    const pieData = {
-        labels: ['Red', 'Blue', 'Yellow'],
-        datasets: [
-            {
-                label: 'Traffic Sources',
-                data: [300, 50, 100],
-                backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)'],
-                borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
+                label: 'Total Spent by Clients',
+                data: [],
+                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1,
             },
         ],
-    };
+    });
+
+    useEffect(() => {
+        if (sellerData && sellerData.getBestSellers) {
+            const sellerLabels = sellerData.getBestSellers.map(seller => `${seller.name} ${seller.lastName}`);
+            const sellerDataPoints = sellerData.getBestSellers.map(seller => seller.totalSpent);
+
+            setSellerChartData({
+                labels: sellerLabels,
+                datasets: [
+                    {
+                        label: 'Total Spent by Sellers',
+                        data: sellerDataPoints,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                    },
+                ],
+            });
+        }
+
+        if (clientData && clientData.getBestClients) {
+            const clientLabels = clientData.getBestClients.map(client => `${client.name} ${client.lastName}`);
+            const clientDataPoints = clientData.getBestClients.map(client => client.totalSpent);
+
+            setClientChartData({
+                labels: clientLabels,
+                datasets: [
+                    {
+                        label: 'Total Spent by Clients',
+                        data: clientDataPoints,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                    },
+                ],
+            });
+        }
+    }, [sellerData, clientData]);
+
+    if (sellerLoading || clientLoading) return <p>Loading...</p>;
+    if (sellerError) return <p>Error: {sellerError.message}</p>;
+    if (clientError) return <p>Error: {clientError.message}</p>;
 
     return (
         <Container>
@@ -61,16 +91,12 @@ const AdministracionPage = () => {
                 <Col md={8}>
                     <h1 className="my-4">Panel de Control</h1>
                     <div className="mb-4">
-                        <h3>Sales Bar Chart</h3>
-                        <Bar data={barData} />
+                        <h3>Best Sellers Total Spent Histogram</h3>
+                        <Bar data={sellerChartData} />
                     </div>
                     <div className="mb-4">
-                        <h3>Revenue Line Chart</h3>
-                        <Line data={lineData} />
-                    </div>
-                    <div className="mb-4">
-                        <h3>Traffic Sources Pie Chart</h3>
-                        <Pie data={pieData} />
+                        <h3>Best Clients Total Spent Histogram</h3>
+                        <Bar data={clientChartData} />
                     </div>
                 </Col>
             </Row>

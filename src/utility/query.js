@@ -74,3 +74,35 @@ export const GETUSERSBYSELLER = gql `
   }
 }
 `;
+
+export const GETBESTSELLERS = gql `
+    query GetBestSellers {
+  getBestSellers {
+    id
+    name
+    lastName
+    totalSpent
+  }
+}
+`;
+
+export const GETBESTCLIENTS = gql `
+    query GetBestClients {
+  getBestClients {
+    id
+    name
+    lastName
+    totalSpent
+  }
+}
+`;
+
+export const GETMOSTSOLDPRODUCTS = gql `
+query GetMostSoldProducts {
+  getMostSoldProducts {
+    name
+    description
+    totalQuantity
+  }
+}
+`;

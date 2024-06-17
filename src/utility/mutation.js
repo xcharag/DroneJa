@@ -78,3 +78,41 @@ export const DELETEPRODUCT = gql `
   }
 }
 `;
+
+export const NEWORDER = gql `
+mutation NewOrder($input: OrderInput) {
+  newOrder(input: $input) {
+    id
+    order {
+      id
+      name
+      quantity
+      price
+    }
+    total
+    client
+    seller
+    status
+    created
+  }
+}
+`;
+
+export const UPDATESTATUS = gql `
+mutation UpdateOrder($updateOrderId: ID!, $input: OrderUpdate) {
+  updateOrder(id: $updateOrderId, input: $input) {
+    id
+    order {
+      id
+      name
+      quantity
+      price
+    }
+    total
+    client
+    seller
+    status
+    created
+  }
+}
+`;
