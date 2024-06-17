@@ -1,5 +1,5 @@
 import { Navbar, Nav, Container } from 'react-bootstrap';
-import { FaShoppingCart, FaUser } from 'react-icons/fa';
+import { FaBackspace, FaUser } from 'react-icons/fa';
 import { PiDroneDuotone } from "react-icons/pi";
 
 const AdminAppBar = () => {
@@ -14,12 +14,12 @@ const AdminAppBar = () => {
                     <Nav className="me-auto">
                         <Nav.Link href="/Administracion">Panel de Control</Nav.Link>
                         <Nav.Link href="/Clientes">Clientes</Nav.Link>
-                        <Nav.Link href="/about">Ordenes</Nav.Link>
+                        <Nav.Link href="/order">Ordenes</Nav.Link>
                         <Nav.Link href="/Stock">Stock</Nav.Link>
                     </Nav>
                     <Nav>
                         <Nav.Link href="/">
-                            <FaShoppingCart /> Volver
+                            <FaBackspace /> Volver
                         </Nav.Link>
                         <Nav.Link href="/account">
                             <FaUser /> Cuenta

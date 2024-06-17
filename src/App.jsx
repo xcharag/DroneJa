@@ -11,6 +11,7 @@ import AdminLayOut from "./components/AdminLayOut.jsx";
 import AdministracionPage from "./pages/Administracion/AdministracionPage.jsx";
 import ClientsPage from "./pages/clients/ClientsPage.jsx";
 import StockPage from "./pages/DroneStock/StockPage.jsx";
+import OrderPage from "./pages/Orders/OrdersPage.jsx";
 import { ApolloProvider } from "@apollo/client";
 import { createApolloContext } from "./utility/ApolloClient.js";
 
@@ -28,7 +29,6 @@ function App() {
                         <DefaultLayOut children={<HomePage />} />
                     }
                 />
-
                 <Route
                     path="/Productos"
                     element={
