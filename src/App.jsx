@@ -78,6 +78,13 @@ function App() {
                         <AdminLayOut children={<StockPage />} />
                     }
                 />
+                <Route
+                    path="/order"
+                    element={
+                        // eslint-disable-next-line react/no-children-prop
+                        <AdminLayOut children={<OrderPage />} />
+                    }
+                />
             </Routes>
         </Router>
       </ApolloProvider>
