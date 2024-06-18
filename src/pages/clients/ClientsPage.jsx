@@ -131,6 +131,7 @@ const ClientsPage = () => {
                 counter += exams.count;
                 setTotalClients(counter);
             });
+
             setclientesporseller(data.clientesporseller);
             setShowExam(true);
         } catch (error) {
