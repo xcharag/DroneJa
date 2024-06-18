@@ -127,11 +127,11 @@ const ClientsPage = () => {
         try {
             const { data } = await clientesBySeller();
                 let counter = 0;
-            data.exam.map(exams => {
+            data.clientesporseller.map(exams => {
                 counter += exams.count;
                 setTotalClients(counter);
             });
-            setclientesporseller(data.exam);
+            setclientesporseller(data.clientesporseller);
             setShowExam(true);
         } catch (error) {
             console.error("Error getting clients by seller:", error);

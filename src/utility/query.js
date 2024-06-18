@@ -108,8 +108,8 @@ query GetMostSoldProducts {
 `;
 
 export const EXAM = gql `
-    query Exam {
-  exam {
+query Query {
+  clientesporseller {
     name
     lastname
     id
