@@ -291,7 +291,7 @@ const ClientsPage = () => {
 
                     <Modal show={showExam} onHide={handleCloseExam}>
                         <Modal.Header closeButton>
-                            <Modal.Title>Exam</Modal.Title>
+                            <Modal.Title>Ejercicio</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
                             {clientesporseller.map(exams => (
