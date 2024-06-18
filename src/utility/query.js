@@ -106,3 +106,14 @@ query GetMostSoldProducts {
   }
 }
 `;
+
+export const EXAM = gql `
+    query Exam {
+  exam {
+    name
+    lastname
+    id
+    count
+  }
+}
+`;
