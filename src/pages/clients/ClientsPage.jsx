@@ -8,7 +8,7 @@ import { useLazyQuery, useMutation } from "@apollo/client";
 const ClientsPage = () => {
     const [clients, setClients] = useState([]);
     const [getAllClients] = useLazyQuery(GETUSERSBYSELLER);
-    const [doExam] = useLazyQuery(EXAM);
+    const [clientesBySeller] = useLazyQuery(EXAM);
     const [addUser] = useMutation(NEWUSER); // Use the mutation
     const [updateUser] = useMutation(UPDATEUSER); // Use the update mutation
 
@@ -17,7 +17,7 @@ const ClientsPage = () => {
     const [showExam, setShowExam] = useState(false);
     const [selectedClient, setSelectedClient] = useState(null);
     const [totalClients, setTotalClients] = useState(0);
-    const [exam, setExam] = useState([]);
+    const [clientesporseller, setclientesporseller] = useState([]);
     const [newClient, setNewClient] = useState({ name: '', lastname: '', email: '', password: '' });
 
     useEffect(() => {
@@ -123,16 +123,15 @@ const ClientsPage = () => {
         }
     };
 
-    const examen = async () => {
+    const getClientsBySeller = async () => {
         try {
-            const { data } = await doExam();
-            console.log(data);
-            let counter = 0;
+            const { data } = await clientesBySeller();
+                let counter = 0;
             data.exam.map(exams => {
                 counter += exams.count;
                 setTotalClients(counter);
             });
-            setExam(data.exam);
+            setclientesporseller(data.exam);
             setShowExam(true);
         } catch (error) {
             console.error("Error getting clients by seller:", error);
@@ -190,8 +189,8 @@ const ClientsPage = () => {
                         Agregar Cliente
                     </Button>
 
-                    <Button variant="primary" className="my-4" onClick={examen}>
-                        Obtener Clientes por Seller
+                    <Button variant="success" onClick={getClientsBySeller}>
+                        Ejercicio de Examen
                     </Button>
 
                     <Modal show={showEditModal} onHide={handleCloseEdit}>
@@ -295,25 +294,16 @@ const ClientsPage = () => {
                             <Modal.Title>Exam</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
-                            <Table striped bordered hover responsive className="table">
-                                <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Cantidad</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {exam.map(exams => (
-                                    <tr key={exams.id}>
-                                        <td>{exams.name}</td>
-                                        <td>{exams.count}</td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </Table>
+                            {clientesporseller.map(exams => (
+                                <div key={exams.id} style={{ marginBottom: '10px' }}>
+                                    <strong>Nombre:</strong> {exams.name}<br />
+                                    <strong>Cantidad:</strong> {exams.count}
+                                </div>
+                            ))}
                             <p>Total de Clientes es: {totalClients}</p>
                         </Modal.Body>
                     </Modal>
+
                 </Col>
             </Row>
         </Container>
